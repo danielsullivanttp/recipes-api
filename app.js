@@ -48,6 +48,8 @@ const app = express();
 
 app.use(express.json());
 
+app.use(logReqMethodAndOriginalURL);
+
 app.get("/", (req, res) => res.send("Recipes is running!!!"));
 app.get("/api/recipes", (req, res) => res.json(recipes));
 app.get("/api/recipes/:id", (req, res) => {
@@ -77,7 +79,7 @@ app.post("/api/recipes", (req, res) => {
 });
 app.patch("/api/recipes/:id", (req, res) => {
   const newRecipe = recipes.find((newRecipe) => {
-    newRecipe.id === Number(req.params.id);
+    return newRecipe.id === Number(req.params.id);
   });
   if (!newRecipe) return res.status(404).send("You are here!!!");
   Object.assign(newRecipe, req.body);
@@ -96,5 +98,10 @@ app.delete("/api/recipes/:id", (req, res) => {
     res.status(404).send("Recipe Not Found!!!");
   }
 });
+
+function logReqMethodAndOriginalURL(req, res, next) {
+  console.log(req.method, req.originalUrl);
+  next();
+}
 
 app.listen(8080, () => console.log("Server running on port 8080"));
