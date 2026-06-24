@@ -62,7 +62,7 @@ app.get("/api/recipes/:id", (req, res) => {
     res.status(404).send("Recipe Not Found!!!");
   }
 });
-app.post("/api/recipes", (req, res) => {
+app.post("/api/recipes", checkForTitleAndCuisine, (req, res) => {
   const { title, cuisine, minutes, servings, vegetarian } = req.body;
   console.log(req.body);
   const newRecipe = {
@@ -77,6 +77,7 @@ app.post("/api/recipes", (req, res) => {
   recipes.push(newRecipe);
   res.status(201).json(newRecipe);
 });
+
 app.patch("/api/recipes/:id", (req, res) => {
   const newRecipe = recipes.find((newRecipe) => {
     return newRecipe.id === Number(req.params.id);
@@ -101,6 +102,16 @@ app.delete("/api/recipes/:id", (req, res) => {
 
 function logReqMethodAndOriginalURL(req, res, next) {
   console.log(req.method, req.originalUrl);
+  next();
+}
+
+function checkForTitleAndCuisine(req, res, next) {
+  if(!req.body.title){
+    return res.status(404).send("Title Not Found!")
+  } 
+  if(!req.body.cuisine){
+    return res.status(404).send("Cuisine Not Found!")
+  }
   next();
 }
 
